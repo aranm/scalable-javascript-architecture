@@ -88,6 +88,10 @@
       activateControl: function (controlId) {
          core.Controls.activate(controlId);
       },
+      
+      createUrlForFileDownload: function (flatParameterArray) {
+         return core.Address.createUrlForFileDownload(flatParameterArray);
+      },
 
       destroyControl: function (controlId) {
          core.Controls.destroy(controlId);
