@@ -1,7 +1,7 @@
 ﻿/*globals Core, $*/
 //$ - (for jquery address)
 
-Core.Address = (function (addressManagement) {
+Core.Address = (function (addressManagement, window) {
 
    var isEnabled = false,
        startsWith = function (stringToSearch, str) {
@@ -244,7 +244,7 @@ Core.Address = (function (addressManagement) {
                 parameters = parameterArray.map(function (keyValuePair) {
                    return keyValuePair.parameter + "/" + keyValuePair.value;
                 }).join("/");
-                
+
             returnValue = baseUrl + "/" + queryString + parameters;
          }
          else {
@@ -284,10 +284,13 @@ Core.Address = (function (addressManagement) {
       useHashAddressScheme: function (useHashScheme) {
          useHash = useHashScheme;
          if (useHash === false) {
-            window.onpopstate = function (event) {
-               // alert("location: " + document.location + ", state: " + JSON.stringify(event.state));
+            window.onpopstate = function () {
+               addressChanged();
             };
+         }
+         else {
+            addressManagement.change(null);
          }
       }
    };
-})($.address);
+})($.address, window);
