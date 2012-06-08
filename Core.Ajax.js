@@ -326,7 +326,7 @@ Core.Ajax = (function (ajaxLibrary) {
                 //it looks through the queue for the callbacks,
                 //however there may be nothing else in the queue and
                 //because the request is cached it never gets added to the queue
-                if (functionExecuted === false){
+                if (functionExecuted === false) {
                    responseFunction(moduleId, requestData, returnValue);
                 }
              },
@@ -336,8 +336,12 @@ Core.Ajax = (function (ajaxLibrary) {
              failure = function (returnValue) {
                 callFunction(callFailure, returnValue);
              },
-             errorFunc = function  (jqXHR, textStatus, errorThrown) {
-                callFunction(callFailure, errorThrown);
+             errorFunc = function (jqXhr, textStatus, errorThrown) {
+                //when a page navigate occurs ajax requests are cancelled, both status and ready state are 0
+                if (jqXhr.status === 0 && jqXhr.readyState === 0) { }
+                else {
+                   callFunction(callFailure, errorThrown);
+                }
              },
              successAndCache = function (ajaxReturnValue) {
                 cache.addDataToCache(ajaxReturnValue, urlMapping, requestData);
