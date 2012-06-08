@@ -24,6 +24,13 @@ Core.DomManipulation = (function ($) {
       },
       animatedShow: function (element, completedCallback) {
          $(element).show('slow', 'swing', completedCallback);
+      },
+      fadeIn: function (element, completedCallback) {
+         $(element).fadeIn('fast', 'swing', completedCallback);
+
+      },
+      fadeOut: function (element, completedCallback) {
+         $(element).fadeOut('fast', 'swing', completedCallback);
       }
    };
 
