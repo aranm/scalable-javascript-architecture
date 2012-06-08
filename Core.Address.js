@@ -266,13 +266,15 @@ Core.Address = (function (addressManagement, window) {
 
       },
       createUrlForFileDownload: function (flatParameterArray) {
-         var baseUrl = addressManagement.baseURL(),
+         var baseUrl = rootUrl,
              allParameters = flatParameterArray.join("/");
-         return baseUrl + "/" + allParameters;
+         return baseUrl + allParameters;
       },
       enable: function () {
          isEnabled = true;
-         addressManagement.change(addressChanged);
+         if (useHash === true) {
+            addressManagement.change(addressChanged);
+         }
       },
       disable: function () {
          isEnabled = false;
