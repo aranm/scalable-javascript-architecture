@@ -42,3 +42,7 @@
       }
    };
 })();
+
+if (window === undefined) {
+   var window = { };
+}

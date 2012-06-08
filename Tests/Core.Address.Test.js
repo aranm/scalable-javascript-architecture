@@ -7,6 +7,7 @@
        };
 
    Core.Address.reset();
+   Core.Address.enable();
    Core.Address.addRoute({ name: "Home", route: [], event: "OpenHomeScreen" });
    Core.Communication.addListener("OpenHomeScreen", openHomeScreenListener);
 
@@ -33,7 +34,8 @@ test("Test basic address route", function () {
           }
        };
 
-   Core.Address.reset();
+       Core.Address.reset();
+       Core.Address.enable();
    Core.Address.addRoute({ name: "ClassScreen", route: ["classId"], event: "OpenClassScreen" });
    Core.Communication.addListener("OpenClassScreen", openScreenListener);
 
@@ -60,7 +62,8 @@ test("Test multiple level address route", function () {
           }
        };
 
-   Core.Address.reset();
+       Core.Address.reset();
+       Core.Address.enable();
    Core.Address.addRoute({ name: "ClassScreen", route: ["classId", "studentId"], event: "OpenEnrolmentScreen" });
    Core.Communication.addListener("OpenEnrolmentScreen", openScreenListener);
 
@@ -85,7 +88,8 @@ test("Test multiple level address route with invalid level no event fires", func
           openScreenCalled = true;
        };
 
-   Core.Address.reset();
+       Core.Address.reset();
+       Core.Address.enable();
 
    Core.Address.addRoute({ name: "Home", route: [] });
    Core.Address.addRoute({ name: "ClassScreen", route: ["classId", "studentId"], event: "OpenEnrolmentScreen" });
@@ -114,7 +118,8 @@ test("Test update path", function () {
           }
        };
 
-   Core.Address.reset();
+       Core.Address.reset();
+       Core.Address.enable();
    Core.Address.addRoute({ name: "ClassScreen", route: ["classId"], event: "OpenEnrolmentScreen" });
    Core.Communication.addListener("OpenEnrolmentScreen", openScreenListener);
 
@@ -140,6 +145,7 @@ test("Test update multiple deep path", function () {
 
    $.addressTesting.reset();
    Core.Address.reset();
+   Core.Address.enable();
    Core.Address.addRoute({ name: "ClassScreen", route: ["classId"] });
    Core.Address.addRoute({ name: "EnrolmentScreen", route: ["classId", "studentId"], event: "OpenEnrolmentScreen" });
    Core.Communication.addListener("OpenEnrolmentScreen", openScreenListener);
@@ -165,6 +171,7 @@ test("Test update multiple deep path with no matching routing", function () {
 
    $.addressTesting.reset();
    Core.Address.reset();
+   Core.Address.enable();
    Core.Address.addRoute({ name: "Home", route: [] });
    Core.Address.addRoute({ name: "ClassScreen", route: ["classId", "studentId"], event: "OpenEnrolmentScreen" });
    Core.Communication.addListener("OpenEnrolmentScreen", openScreenListener);
