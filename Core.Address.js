@@ -15,7 +15,8 @@ Core.Address = (function (addressManagement, window) {
           var i, returnValue = true, arrayOneLength = arrayOne.length, arrayTwoLength = arrayTwo.length;
           if (arrayOneLength !== arrayTwoLength) {
              returnValue = false;
-          } else {
+          } 
+          else {
              for (i = 0; i < arrayOneLength && returnValue === true; i++) {
                 if (arrayOne[i] !== arrayTwo[i]) {
                    returnValue = false;
@@ -24,9 +25,8 @@ Core.Address = (function (addressManagement, window) {
           }
           return returnValue;
        },
-       getParametersUsingBaseUrl = function () {
-          var returnValue = [],
-              currentUrl = addressManagement.baseURL();
+       getParametersUsingBaseUrl = function (currentUrl) {
+          var returnValue = [];
 
           if (startsWith(currentUrl, rootUrl)) {
              returnValue = currentUrl.substring(rootUrl.length).split("/");
@@ -89,7 +89,7 @@ Core.Address = (function (addressManagement, window) {
           updateTimer = setTimeout(action, 0);
        },
        addressChanged = function (evt) {
-          var urlDetails = getUrlDetails(evt),
+          var urlDetails = getUrlDetails(evt, addressManagement.baseURL()),
           mapping = getMapping(urlDetails.map(function (item) { return item.key; })),
           argumentList;
 
@@ -144,22 +144,24 @@ Core.Address = (function (addressManagement, window) {
           addressManagement.value("");
           updateAddressUrl();
        },
-       getUrlDetails = function (evt) {
+       getUrlDetails = function (evt, currentUrl) {
           var returnValue = [], i, arrayLength, key, value, parameterNames, integerRepresentation;
 
           if (useHash == false) {
-             parameterNames = getParametersUsingBaseUrl();
+             parameterNames = getParametersUsingBaseUrl(currentUrl);
              arrayLength = parameterNames.length;
              for (i = 0; i < arrayLength; i++) {
                 key = parameterNames[i];
                 i++;
                 if (i >= arrayLength) {
                    value = "";
-                } else {
+                }
+                else {
                    integerRepresentation = parseInt(parameterNames[i], 10);
                    if (isNaN(integerRepresentation)) {
                       value = parameterNames[i];
-                   } else {
+                   }
+                   else {
                       value = integerRepresentation;
                    }
                 }
@@ -168,10 +170,37 @@ Core.Address = (function (addressManagement, window) {
                    value: value
                 });
              }
-          } else {
+          }
+          else {
              returnValue = intify(evt.parameters);
           }
           return returnValue;
+       },
+       navigateToUrl = function (url) {
+          var urlDetails = getUrlDetails(undefined, url),
+              mapping = getMapping(urlDetails.map(function (item) { return item.key; })),
+              argumentList,
+              didNavigate = false;
+
+          if (isEnabled === false) { }
+          else if (mapping === null) { }
+          else {
+             //reset the parameters
+             currentParameters = {};
+             argumentList = [];
+             argumentList.push(mapping.event);
+             urlDetails.forEach(function (item) {
+                var value = item.value;
+                argumentList.push(value);
+                //update the current parameters list
+                currentParameters[item.key] = value;
+             });
+             //raise the notification
+             Core.Communication.notify.apply(null, argumentList);
+             updateAddressUrl();
+             didNavigate = true;
+          }
+          return didNavigate;
        },
        createHashUrl = function (parameter, value) {
           //function creates a URL from the current url by appending the parameter and value
@@ -200,6 +229,9 @@ Core.Address = (function (addressManagement, window) {
       reset: function () {
          mappings = [];
          currentParameters = {};
+      },
+      navigateToUrl: function (url) {
+         return navigateToUrl(url);
       },
       removeAddressComponent: function (parameter) {
          if (currentParameters[parameter] !== undefined) {
@@ -234,36 +266,38 @@ Core.Address = (function (addressManagement, window) {
          }
          return returnValue;
       },
-      createUrlFromParameterArray: function (parameterArray) {
+      createUrlFromParameterArray: function (parameterArray, addParametersToCurrentUrl) {
+         var returnValue,
+             baseUrl,
+             queryString,
+             parameters;
 
-         var returnValue;
-
-         if (useHash === false) {
-            var baseUrl = addressManagement.baseURL(),
-                queryString = addressManagement.queryString(),
-                parameters = parameterArray.map(function (keyValuePair) {
-                   return keyValuePair.parameter + "/" + keyValuePair.value;
-                }).join("/");
-
-            returnValue = baseUrl + "/" + queryString + parameters;
+         if (addParametersToCurrentUrl === false) {
+            baseUrl = rootUrl;
          }
          else {
-            var baseUrl = addressManagement.baseURL(),
-                queryString = addressManagement.queryString(),
-                parameters = parameterArray.map(function (keyValuePair) {
-                   return keyValuePair.parameter + "=" + keyValuePair.value;
-                }).join("&");
+            baseUrl = addressManagement.baseURL() + "/";
+         }
 
+         if (useHash === false) {
+            queryString = addressManagement.queryString();
+            parameters = parameterArray.map(function (keyValuePair) {
+               return keyValuePair.parameter + "/" + keyValuePair.value;
+            }).join("/");
+            returnValue = baseUrl  + queryString + parameters;
+         }
+         else {
+            
+            queryString = addressManagement.queryString();
+            parameters = parameterArray.map(function (keyValuePair) {
+               return keyValuePair.parameter + "=" + keyValuePair.value;
+            }).join("&");
             if (queryString !== "") {
                queryString = queryString + "&";
             }
-
-            returnValue = baseUrl + "/#/?" + queryString + parameters;
+            returnValue = baseUrl + "#/?" + queryString + parameters;
          }
          return returnValue;
-
-         //function creates a URL from the current url by appending the parameter and value
-
       },
       createUrlForFileDownload: function (flatParameterArray) {
          var baseUrl = rootUrl,
@@ -274,6 +308,9 @@ Core.Address = (function (addressManagement, window) {
          isEnabled = true;
          if (useHash === true) {
             addressManagement.change(addressChanged);
+         }
+         else {
+            addressChanged();
          }
       },
       disable: function () {
