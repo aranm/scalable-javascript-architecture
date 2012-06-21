@@ -1,5 +1,5 @@
 ﻿/*globals Core, $*/
-Core.DomManipulation = (function ($) {
+Core.DomManipulation = (function ($, document) {
 
    var elementMappings = {};
 
@@ -20,14 +20,18 @@ Core.DomManipulation = (function ($) {
       },
       animatedHide: function (element, completedCallback) {
          $(element).hide('slow', 'swing', completedCallback);
-
       },
       animatedShow: function (element, completedCallback) {
          $(element).show('slow', 'swing', completedCallback);
       },
+      animatedShowRightToLeft: function (element, completedCallback) {
+         $(element).show('slide', { direction: 'right' }, 500, completedCallback);
+      },
+      animatedHideLeftToRight: function (element, completedCallback) {
+         $(element).hide('slide', { direction: 'right' }, 500, completedCallback);
+      },
       fadeIn: function (element, completedCallback) {
          $(element).fadeIn('fast', 'swing', completedCallback);
-
       },
       fadeOut: function (element, completedCallback) {
          $(element).fadeOut('fast', 'swing', completedCallback);
@@ -65,6 +69,9 @@ Core.DomManipulation = (function ($) {
       closeDialog: function (name) {
          var element = $(elementMappings[name]);
          element.modal('hide');
+      },
+      setDocumentTitle: function (newTitle) {
+         document.title = newTitle;
       }
    };
-})($);
+})($, document);
