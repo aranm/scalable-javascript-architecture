@@ -8,6 +8,9 @@
          change: function (callback) {
             changeCallback = callback;
          },
+         baseURL: function () {
+            return "";
+         },
          update: function () {
             var key,
                 value,
