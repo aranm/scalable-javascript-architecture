@@ -29,6 +29,10 @@
          core.Ajax.request(data, moduleId);
       },
 
+      cancelRequests: function () {
+         core.Ajax.cancelRequests(moduleId);
+      },
+
       bind: function (viewModel) {
          return core.DataBinding.applyBinding(moduleId, viewModel);
       },
@@ -72,7 +76,9 @@
       updateAddressParameters: function (parameterArray) {
          core.Address.updateAddressParameters(parameterArray);
       },
-
+      removeAddressParameter: function (parameterArray) {
+         core.Address.removeAddressParameter(parameterArray);
+      },
       removeAddressComponent: function (parameter) {
          core.Address.removeAddressComponent(parameter);
       },
@@ -81,14 +87,14 @@
          return core.Address.createUrl(parameter, value);
       },
 
-      createUrlFromParameterArray: function (parameterArray) {
-         return core.Address.createUrlFromParameterArray(parameterArray);
+      createUrlFromParameterArray: function (parameterArray, addParametersToCurrentUrl) {
+         return core.Address.createUrlFromParameterArray(parameterArray, addParametersToCurrentUrl);
       },
 
       activateControl: function (controlId) {
          core.Controls.activate(controlId);
       },
-      
+
       createUrlForFileDownload: function (flatParameterArray) {
          return core.Address.createUrlForFileDownload(flatParameterArray);
       },
@@ -103,6 +109,10 @@
 
       sendControlMessages: function (controlId, messages) {
          core.Controls.sendMessage(controlId, messages);
+      },
+
+      setDocumentTitle: function (newTitle) {
+         core.DomManipulation.setDocumentTitle(newTitle);
       }
    };
 };
