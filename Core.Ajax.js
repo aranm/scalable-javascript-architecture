@@ -277,8 +277,68 @@ Core.Ajax = (function (ajaxLibrary) {
             }
          }
       };
-   })();
+   })(),
 
+   storedRequests = (function () {
+      var storedRequestData = {};
+
+      return {
+         storeRequest: function (data, moduleId) {
+            if (storedRequestData[moduleId] === undefined) {
+               storedRequestData[moduleId] = [];
+            }
+            storedRequestData[moduleId].push(data);
+         },
+         removeRequest: function (data, moduleId) {
+            var requestList = storedRequestData[moduleId],
+            i,
+            arrayLength,
+            request,
+            valueFound = false;
+            if (requestList !== undefined) {
+               arrayLength = requestList.length;
+               for (i = 0; i < arrayLength && valueFound === false; i++) {
+                  request = requestList[i];
+                  if (request === data) {
+                     requestList.splice(i, 1);
+                     valueFound = true;
+                  }
+               }
+            }
+         },
+         abortRequest: function (data, moduleId) {
+            var requestList = storedRequestData[moduleId],
+            i,
+            arrayLength,
+            request,
+            valueFound = false;
+            if (requestList !== undefined) {
+               arrayLength = requestList.length;
+               for (i = 0; i < arrayLength && valueFound === false; i++) {
+                  request = requestList[i];
+                  if (request === data) {
+                     request.abort();
+                     valueFound = true;
+                  }
+               }
+            }
+         },
+         abortAllForModule: function (moduleId) {
+            var requestList = storedRequestData[moduleId],
+            i,
+            arrayLength,
+            request;
+            if (requestList !== undefined) {
+               arrayLength = requestList.length;
+               for (i = 0; i < arrayLength; i++) {
+                  request = requestList[i];
+                  request.abort();
+               }
+            }
+         }
+      };
+   })();
+   
    return {
 
       UrlMapper: urlMapper,
@@ -302,9 +362,15 @@ Core.Ajax = (function (ajaxLibrary) {
       //   }
       request: function (requestData, moduleId) {
          //first look up the URL
-         var urlMapping = Core.Ajax.UrlMapper.getMapping(requestData.name);
+         var currentAjaxRequest,
+             urlMapping = Core.Ajax.UrlMapper.getMapping(requestData.name);
 
          var ajaxMessage,
+             removeAllQueuedRequests = function () {
+                if (urlMapping.queueRequest === true) {
+                   queue.removeAllMatchingRequests(requestData);
+                }
+             },
              callFunction = function (responseFunction, returnValue) {
                 var i,
                     arrayLength,
@@ -331,17 +397,23 @@ Core.Ajax = (function (ajaxLibrary) {
                 }
              },
              success = function (returnValue) {
+                storedRequests.removeRequest(currentAjaxRequest, moduleId);
                 callFunction(callSuccess, returnValue);
              },
              failure = function (returnValue) {
+                storedRequests.removeRequest(currentAjaxRequest, moduleId);
                 callFunction(callFailure, returnValue);
              },
              errorFunc = function (jqXhr, textStatus, errorThrown) {
+                storedRequests.removeRequest(currentAjaxRequest, moduleId);
                 //when a page navigate occurs ajax requests are cancelled, both status and ready state are 0
                 if (jqXhr.status === 0 && jqXhr.readyState === 0) { }
+                //when we abort an ajax call we dont want to call the failure method
+                else if (textStatus === "abort") { }
                 else {
                    callFunction(callFailure, errorThrown);
                 }
+                removeAllQueuedRequests();
              },
              successAndCache = function (ajaxReturnValue) {
                 cache.addDataToCache(ajaxReturnValue, urlMapping, requestData);
@@ -398,9 +470,14 @@ Core.Ajax = (function (ajaxLibrary) {
                   ajaxMessage.context = requestData.context;
                }
 
-               ajaxLibrary.ajax(ajaxMessage);
+               currentAjaxRequest = ajaxLibrary.ajax(ajaxMessage);
+               storedRequests.storeRequest(currentAjaxRequest, moduleId);
             }
          }
+      },
+
+      cancelRequests: function (moduleId) {
+         storedRequests.abortAllForModule(moduleId);
       }
    };
 })($);
