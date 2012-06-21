@@ -1,41 +1,75 @@
 ﻿/*globals Sandbox*/
 var Core = (function () {
    // Private Variable
-   var modules = {},
+   var modules = { },
        slice = [].slice,
-       sandboxFactory = {
-          getNewSandbox: function (core, moduleId) {
-             return new Sandbox(core, moduleId);
+       //the sandbox factory allows the default sandbox behaviour to be replaced at runtime allowing for easier unit testing
+   //the default sandbox factory allows dynamic addition of functions to the sandbox at runtime
+       sandboxFactory = (function() {
+          var sandboxFunctions = { };
+
+          return {
+             getNewSandbox: function(core, moduleId) {
+                var newSandbox = new Sandbox(core, moduleId);
+                for (var property in sandboxFunctions) {
+                   if (sandboxFunctions.hasOwnProperty(property)) {
+                      var sandboxFunction = (function() {
+                         var returnValue,
+                             newFunctionDefinition = sandboxFunctions[property];
+
+                         if (newFunctionDefinition.passModuleId) {
+                            returnValue = function() {
+                               var functionArguments = slice.call(arguments, 0);
+                               functionArguments.push(moduleId);
+                               return newFunctionDefinition.functionPointer.apply(newFunctionDefinition.context, functionArguments);
+                            };
+                         } else {
+                            returnValue = function() {
+                               return newFunctionDefinition.functionPointer.apply(newFunctionDefinition.context, slice.call(arguments, 0));
+                            };
+                         }
+                         return returnValue;
+                      })();
+                      newSandbox[property] = sandboxFunction;
+                   }
+                }
+
+                return newSandbox;
+             },
+             addSandboxFunction: function(name, func, context, passModuleId) {
+                sandboxFunctions[name] = { functionPointer: func, context: context, passModuleId: passModuleId };
+             }
+          };
+       })(),
+       createInstance = function(moduleId, sandbox) {
+          var module = modules[moduleId],
+              i,
+              arrayLength,
+              args = module.args,
+              newArguments = [],
+              instance;
+
+          newArguments.push(sandbox);
+          for (i = 0, arrayLength = args.length; i < arrayLength; i++) {
+             newArguments.push(args[i]);
           }
+
+          instance = modules[moduleId].creator.apply(null, newArguments);
+
+          if (Core.Error !== undefined) {
+             Core.Error.sanitise(instance);
+             Core.Error.sanitise(sandbox);
+          }
+
+          return instance;
        };
 
-   function createInstance(moduleId, sandbox) {
-      var module = modules[moduleId],
-            i,
-            arrayLength,
-            args = module.args,
-            newArguments = [],
-            instance;
-
-      newArguments.push(sandbox);
-      for (i = 0, arrayLength = args.length; i < arrayLength; i++) {
-         newArguments.push(args[i]);
-      }
-
-      instance = modules[moduleId].creator.apply(null, newArguments);
-
-      if (Core.Error !== undefined) {
-         Core.Error.sanitise(instance);
-         Core.Error.sanitise(sandbox);
-      }
-
-      return instance;
-   }
-
-   //  Public method
    return {
       setSandboxFactory: function (newFactory) {
          sandboxFactory = newFactory;
+      },
+      getSandboxFactory: function () {
+         return sandboxFactory;
       },
       register: function (moduleId, Creator) {
          modules[moduleId] = {
