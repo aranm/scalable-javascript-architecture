@@ -5,17 +5,19 @@ Core.Address = (function (addressManagement, window) {
 
    var isEnabled = false,
        startsWith = function (stringToSearch, str) {
-          return stringToSearch.slice(0, str.length) == str;
+          //NOTE: The toLowerCase can fail in a language such as turkish
+          return stringToSearch.toLowerCase().slice(0, str.length) == str.toLowerCase();
        },
        rootUrl,
        useHash = true,
+       forceNavigate = false,
        mappings = [],
        currentParameters = {},
        compareArrays = function (arrayOne, arrayTwo) {
           var i, returnValue = true, arrayOneLength = arrayOne.length, arrayTwoLength = arrayTwo.length;
           if (arrayOneLength !== arrayTwoLength) {
              returnValue = false;
-          } 
+          }
           else {
              for (i = 0; i < arrayOneLength && returnValue === true; i++) {
                 if (arrayOne[i] !== arrayTwo[i]) {
@@ -28,7 +30,8 @@ Core.Address = (function (addressManagement, window) {
        getParametersUsingBaseUrl = function (currentUrl) {
           var returnValue = [];
 
-          if (startsWith(currentUrl, rootUrl)) {
+          if (currentUrl.toLowerCase() === rootUrl.toLowerCase()){}
+          else if (startsWith(currentUrl, rootUrl)) {
              returnValue = currentUrl.substring(rootUrl.length).split("/");
           }
           return returnValue;
@@ -88,6 +91,30 @@ Core.Address = (function (addressManagement, window) {
           }
           updateTimer = setTimeout(action, 0);
        },
+       isSameUrl = function (urlDetails) {
+
+          var newArray = [],
+         propertName,
+         i, arrayLength = urlDetails.length, item, returnValue = true;
+          for (propertName in currentParameters) {
+             if (currentParameters.hasOwnProperty(propertName)) {
+                newArray.push({ key: propertName, value: currentParameters[propertName] });
+             }
+          }
+
+          if (newArray.length !== urlDetails.length) {
+             returnValue = false;
+          }
+          else {
+             for (i = 0; i < arrayLength && returnValue === true; i++) {
+                item = urlDetails[i];
+                if (currentParameters[item.key] !== item.value) {
+                   returnValue = false;
+                }
+             }
+          }
+          return returnValue;
+       },
        addressChanged = function (evt) {
           var urlDetails = getUrlDetails(evt, addressManagement.baseURL()),
           mapping = getMapping(urlDetails.map(function (item) { return item.key; })),
@@ -96,8 +123,9 @@ Core.Address = (function (addressManagement, window) {
           if (isEnabled === false) { }
           else if (mapping === null) {
              //if there is no mapping force the redirect to the "home" page
-             clearAllAddressParameters();
+             Core.Communication.notify("NavigationError", rootUrl);
           }
+          else if (forceNavigate === false && isSameUrl(urlDetails) === true && urlDetails.length !== 0) { }
           else {
              //reset the parameters
              currentParameters = {};
@@ -110,10 +138,10 @@ Core.Address = (function (addressManagement, window) {
                 //update the current parameters list
                 currentParameters[item.key] = value;
              });
-
              //raise the notification
              Core.Communication.notify.apply(null, argumentList);
           }
+
        },
        updateAddressUrl = function () {
           var key, currentPathArray = [], newPath = "";
@@ -125,7 +153,7 @@ Core.Address = (function (addressManagement, window) {
              }
              newPath = rootUrl + currentPathArray.join("/");
              history.pushState({ path: newPath }, "", newPath);
-             addressChanged();
+             addressChanged(undefined);
           }
           else {
              queueAction(function () {
@@ -134,15 +162,11 @@ Core.Address = (function (addressManagement, window) {
                       addressManagement.parameter(key, currentParameters[key]);
                    }
                 }
+                forceNavigate = true;
                 addressManagement.update();
+                forceNavigate = false;
              });
           }
-       },
-       clearAllAddressParameters = function () {
-          currentParameters = {};
-          //set the address back to the root url
-          addressManagement.value("");
-          updateAddressUrl();
        },
        getUrlDetails = function (evt, currentUrl) {
           var returnValue = [], i, arrayLength, key, value, parameterNames, integerRepresentation;
@@ -157,6 +181,7 @@ Core.Address = (function (addressManagement, window) {
                    value = "";
                 }
                 else {
+
                    integerRepresentation = parseInt(parameterNames[i], 10);
                    if (isNaN(integerRepresentation)) {
                       value = parameterNames[i];
@@ -165,6 +190,7 @@ Core.Address = (function (addressManagement, window) {
                       value = integerRepresentation;
                    }
                 }
+
                 returnValue.push({
                    key: key,
                    value: value
@@ -181,9 +207,9 @@ Core.Address = (function (addressManagement, window) {
               mapping = getMapping(urlDetails.map(function (item) { return item.key; })),
               argumentList,
               didNavigate = false;
-
           if (isEnabled === false) { }
           else if (mapping === null) { }
+          else if (url.length > 0 && url.charAt(url.length - 1) === "#") { }
           else {
              //reset the parameters
              currentParameters = {};
@@ -197,6 +223,7 @@ Core.Address = (function (addressManagement, window) {
              });
              //raise the notification
              Core.Communication.notify.apply(null, argumentList);
+             forceNavigate = false;
              updateAddressUrl();
              didNavigate = true;
           }
@@ -236,13 +263,25 @@ Core.Address = (function (addressManagement, window) {
       removeAddressComponent: function (parameter) {
          if (currentParameters[parameter] !== undefined) {
             currentParameters[parameter] = "";
+            forceNavigate = true;
             updateAddressUrl();
+            forceNavigate = false;
+         }
+      },
+      removeAddressParameter: function (parameter) {
+         if (currentParameters[parameter] !== undefined) {
+            delete currentParameters[parameter];
+            forceNavigate = true;
+            updateAddressUrl();
+            forceNavigate = false;
          }
       },
       updateAddress: function (parameter, value) {
          if (currentParameters[parameter] !== value) {
             currentParameters[parameter] = value;
+            forceNavigate = true;
             updateAddressUrl();
+            forceNavigate = false;
          }
       },
       updateAddressParameters: function (parameterArray) {
@@ -254,7 +293,9 @@ Core.Address = (function (addressManagement, window) {
          });
 
          //then update the address
+         forceNavigate = true;
          updateAddressUrl();
+         forceNavigate = false;
       },
       createUrl: function (parameter, value) {
          var returnValue;
@@ -284,10 +325,10 @@ Core.Address = (function (addressManagement, window) {
             parameters = parameterArray.map(function (keyValuePair) {
                return keyValuePair.parameter + "/" + keyValuePair.value;
             }).join("/");
-            returnValue = baseUrl  + queryString + parameters;
+            returnValue = baseUrl + queryString + parameters;
          }
          else {
-            
+
             queryString = addressManagement.queryString();
             parameters = parameterArray.map(function (keyValuePair) {
                return keyValuePair.parameter + "=" + keyValuePair.value;
