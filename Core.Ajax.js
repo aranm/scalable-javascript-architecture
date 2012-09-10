@@ -20,7 +20,10 @@ Core.Ajax = (function (ajaxLibrary) {
 
    callSuccess = function (moduleId, tempRequest, returnValue) {
       if (Core.moduleIsActive(moduleId)) {
-         if (returnValue.RequestSucceeded === undefined) {
+         if (returnValue === null) {
+            tryCallFunction(tempRequest.success, tempRequest.context, null);
+         }
+         else if (returnValue.RequestSucceeded === undefined) {
             tryCallFunction(tempRequest.success, tempRequest.context, returnValue);
          }
          else if (returnValue.RequestSucceeded === true) {
