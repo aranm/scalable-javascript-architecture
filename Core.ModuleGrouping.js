@@ -77,6 +77,7 @@ Core.ModuleGrouping = (function () {
 
                 //add the module grouing to the list of module groupings that are running
                 runningModuleGroupings.push(groupingName);
+                Core.Communication.notify("ModuleGroupingStarting", groupingName);
              }
 
              //raise events regardless whether the module was started or not
@@ -96,7 +97,7 @@ Core.ModuleGrouping = (function () {
              returnValue = false;
           }
           else {
-
+             Core.Communication.notify("ModuleGroupingStopping", groupingName);
              if (stopDependants === false) { }
              else {
                 //stop any dependant modules
