@@ -113,6 +113,10 @@
 
       setDocumentTitle: function (newTitle) {
          core.DomManipulation.setDocumentTitle(newTitle);
+      },
+
+      consoleLog: function (message) {
+         core.Error.consoleLog(message);
       }
    };
 };

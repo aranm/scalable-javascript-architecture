@@ -1,13 +1,15 @@
 ﻿/*globals Core*/
 Core.Error = (function (window) {
 
-//   window.onerror = function (msg, url, num) {
-//      if (window.debug !== undefined && window.debug === false) {
-//         Core.Error.log(1, msg + ';' + url + ';' + num);
-//         return true;
-//      }
-//   };
-
+   //   window.onerror = function (msg, url, num) {
+   //      if (window.debug !== undefined && window.debug === false) {
+   //         Core.Error.log(1, msg + ';' + url + ';' + num);
+   //         return true;
+   //      }
+   //   };
+   var isFunction = function (object) {
+      return typeof (object) == 'function';
+   };
 
    return {
       log: function (severity, message) {
@@ -31,6 +33,13 @@ Core.Error = (function (window) {
             }
          }
       },
+      consoleLog: function (message) {
+         if (window.console !== undefined) {
+            if (window.console.log !== undefined && isFunction(window.console.log) === true) {
+               window.console.log(message);
+            }
+         }
+      },
       sanitise: function sanitise(instance) {
          var method, name;
          if (window.debug === false) {
@@ -40,10 +49,10 @@ Core.Error = (function (window) {
                   instance[name] = (function (name, method) {
                      return function () {
                         //try {
-                           return method.apply(this, arguments);
+                        return method.apply(this, arguments);
                         //}
                         //catch (ex) {
-                           //Core.Error.log(1, name + "(): " + ex.message);
+                        //Core.Error.log(1, name + "(): " + ex.message);
                         //}
                      };
                   })(name, method);
