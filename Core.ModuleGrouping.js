@@ -32,7 +32,7 @@ Core.ModuleGrouping = (function () {
        moduleGroupIsRunning = function (groupingName) {
           return inArray(runningModuleGroupings, groupingName);
        },
-       startModuleGroup = function (groupingName) {
+       startModuleGroup = function (groupingName, isSubGroup, isPrimaryModuleGroup) {
           var i,
              arrayLength,
              returnValue = false,
@@ -48,12 +48,16 @@ Core.ModuleGrouping = (function () {
                 if (grouping.dependsOnModuleGroupings !== undefined) {
                    for (i = 0, arrayLength = grouping.dependsOnModuleGroupings.length; i < arrayLength; i++) {
                       //recursive call to start module grouping
-                      startModuleGroup(grouping.dependsOnModuleGroupings[i]);
+                      startModuleGroup(grouping.dependsOnModuleGroupings[i], true, isPrimaryModuleGroup);
                    }
                 }
 
                 //let the world know we are loading these modules
                 raiseEvents(groupingName, previewEvents);
+
+                if (isSubGroup !== true || isPrimaryModuleGroup === true) {
+                   Core.Communication.notify("LeafModuleGroupingStarting", groupingName);
+                }
 
                 if (grouping.startsModules !== undefined) {
                    for (i = 0, arrayLength = grouping.startsModules.length; i < arrayLength; i++) {
@@ -78,10 +82,14 @@ Core.ModuleGrouping = (function () {
                 //add the module grouing to the list of module groupings that are running
                 runningModuleGroupings.push(groupingName);
                 Core.Communication.notify("ModuleGroupingStarting", groupingName);
-             }
 
-             //raise events regardless whether the module was started or not
-             raiseEvents(groupingName, restartEvents);
+             }
+             else {
+                raiseEvents(groupingName, restartEvents);
+                if (isSubGroup !== true) {
+                   Core.Communication.notify("LeafModuleGroupingStarting", groupingName);
+                }
+             }
           }
 
           return returnValue;
@@ -179,11 +187,11 @@ Core.ModuleGrouping = (function () {
        },
        stopModuleGroupingAndStartAnotherGrouping = function (stopGroupingName, startGroupingName) {
           if (stopGroupingName === undefined || stopGroupingName === "") {
-             startModuleGroup(startGroupingName);
+             startModuleGroup(startGroupingName, false, true);
           }
           else {
              stopNonDependantModules(stopGroupingName, startGroupingName);
-             startModuleGroup(startGroupingName);
+             startModuleGroup(startGroupingName, false, false);
           }
        },
       registerArguments = function (parameters) {
