@@ -30,7 +30,7 @@ Core.Address = (function (addressManagement, window) {
        getParametersUsingBaseUrl = function (currentUrl) {
           var returnValue = [];
 
-          if (currentUrl.toLowerCase() === rootUrl.toLowerCase()){}
+          if (currentUrl.toLowerCase() === rootUrl.toLowerCase()) { }
           else if (startsWith(currentUrl, rootUrl)) {
              returnValue = currentUrl.substring(rootUrl.length).split("/");
           }
@@ -310,6 +310,8 @@ Core.Address = (function (addressManagement, window) {
       createUrlFromParameterArray: function (parameterArray, addParametersToCurrentUrl) {
          var returnValue,
              baseUrl,
+             i,
+             stringToFind,
              queryString,
              parameters;
 
@@ -325,16 +327,26 @@ Core.Address = (function (addressManagement, window) {
             parameters = parameterArray.map(function (keyValuePair) {
                return keyValuePair.parameter + "/" + keyValuePair.value;
             }).join("/");
+            for (i = 0; i < parameterArray.length; i++) {
+               stringToFind = parameterArray[i].parameter;
+               stringToFind = stringToFind + "/[0-9]+/";
+               baseUrl = baseUrl.replace(new RegExp(stringToFind, "gi"), "");
+            }
             returnValue = baseUrl + queryString + parameters;
          }
          else {
-
             queryString = addressManagement.queryString();
             parameters = parameterArray.map(function (keyValuePair) {
                return keyValuePair.parameter + "=" + keyValuePair.value;
             }).join("&");
+            
             if (queryString !== "") {
                queryString = queryString + "&";
+            }
+            for (i = 0; i < parameterArray.length; i++) {
+               stringToFind = parameterArray[i].parameter;
+               stringToFind = stringToFind + "=[0-9]+&";
+               queryString = queryString.replace(new RegExp(stringToFind, "gi"), "");
             }
             returnValue = baseUrl + "#/?" + queryString + parameters;
          }
