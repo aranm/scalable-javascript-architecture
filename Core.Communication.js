@@ -79,15 +79,6 @@
          }
       };
    };
-
-   //if (typeof require === 'function') {
-   //   require(["Core"], function (core) {
-   //      core.Communication = coreCommunication();
-   //   });
-   //}
-   //else {
-   //   Core.Communication = coreCommunication();
-   //}
    
    // Expose Core as an AMD module
    if (typeof define === "function" && define.amd && define.amd.jQuery) {
@@ -99,5 +90,4 @@
    else {
       Core.Communication = coreCommunication();
    }
-
 })();

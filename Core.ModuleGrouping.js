@@ -1,7 +1,5 @@
 ﻿/*globals Core, require*/
-
 (function () {
-
    var coreModuleGrouping = function (core, communication) {
 
       var moduleGroupings = {},
@@ -278,12 +276,11 @@
    };
 
    if (typeof require === 'function') {
-      require(["Core", "CoreCommunication"], function (core, coreCommunication) {
+      define("CoreModuleGrouping", ["Core", "CoreCommunication"], function (core, coreCommunication) {
          core.ModuleGrouping = coreModuleGrouping(core, coreCommunication);
       });
    }
    else {
       Core.ModuleGrouping = coreModuleGrouping(Core, Core.Communication);
    }
-
 })();
