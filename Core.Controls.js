@@ -1,4 +1,4 @@
-﻿/*globals Core*/
+﻿/*globals Core, require*/
 Core.Controls = (function () {
    var controls = {},
        slice = [].slice,

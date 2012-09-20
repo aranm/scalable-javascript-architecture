@@ -1,78 +1,91 @@
-﻿/*globals Core, ko*/
-Core.DataBinding = (function (dom, ko) {
+﻿/*globals Core, ko, require*/
 
-   var urlMappings = {};
+(function () {
 
-   return {
-      getMapping: function (name) {
-         return urlMappings[name];
-      },
-      addMapping: function (name, domElement) {
-         if (!urlMappings[name]) {
-            urlMappings[name] = [];
-         }
-         urlMappings[name].push(domElement);
-      },
-      applyBinding: function (moduleId, viewModel) {
+   var dataBindingFunction = function (dom, ko) {
 
-         var i, arrayLength, mappings = this.getMapping(moduleId), errors = "", domElement, element;
+      var urlMappings = {};
 
-         if (mappings === null || mappings === undefined) {
-            throw new Error("No mapping defined for: " + moduleId);
-         }
+      return {
+         getMapping: function (name) {
+            return urlMappings[name];
+         },
+         addMapping: function (name, domElement) {
+            if (!urlMappings[name]) {
+               urlMappings[name] = [];
+            }
+            urlMappings[name].push(domElement);
+         },
+         applyBinding: function (moduleId, viewModel) {
 
+            var i, arrayLength, mappings = this.getMapping(moduleId), errors = "", domElement, element;
 
-         for (i = 0, arrayLength = mappings.length; i < arrayLength; i++) {
-            domElement = mappings[i];
-
-            if (domElement === undefined || domElement === null) {
-               errors += "Unmapped moduleId passed to bind: " + moduleId + '\n';
+            if (mappings === null || mappings === undefined) {
+               throw new Error("No mapping defined for: " + moduleId);
             }
 
-            element = dom.getElementById(domElement);
-            if (element === undefined || element === null) {
-               errors += "Undefined dom element passed to bind: " + domElement + '\n';
-            }
-            else {
-               ko.applyBindings(viewModel, element);
-            }
-         }
 
-         //throw any accumulated errors
-         if (errors !== "") {
-            throw new Error(errors);
-         }
-      },
-      removeBinding: function (moduleId) {
+            for (i = 0, arrayLength = mappings.length; i < arrayLength; i++) {
+               domElement = mappings[i];
 
-         var i, arrayLength, mappings = this.getMapping(moduleId), errors = "", domElement, element;
+               if (domElement === undefined || domElement === null) {
+                  errors += "Unmapped moduleId passed to bind: " + moduleId + '\n';
+               }
 
-         if (mappings === null || mappings === undefined) {
-            throw new Error("No mapping defined for: " + moduleId);
-         }
-
-
-         for (i = 0, arrayLength = mappings.length; i < arrayLength; i++) {
-            domElement = mappings[i];
-
-            if (domElement === undefined || domElement === null) {
-               errors += "Unmapped moduleId passed to bind: " + moduleId + '\n';
+               element = dom.getElementById(domElement);
+               if (element === undefined || element === null) {
+                  errors += "Undefined dom element passed to bind: " + domElement + '\n';
+               } else {
+                  ko.applyBindings(viewModel, element);
+               }
             }
 
-            element = dom.getElementById(domElement);
-            if (element === undefined || element === null) {
-               errors += "Undefined dom element passed to bind: " + domElement + '\n';
+            //throw any accumulated errors
+            if (errors !== "") {
+               throw new Error(errors);
             }
-            else {
-               //remove any bindings on the node
-               ko.cleanNode(element);
-            }
-         }
+         },
+         removeBinding: function (moduleId) {
 
-         //throw any accumulated errors
-         if (errors !== "") {
-            throw new Error(errors);
+            var i, arrayLength, mappings = this.getMapping(moduleId), errors = "", domElement, element;
+
+            if (mappings === null || mappings === undefined) {
+               throw new Error("No mapping defined for: " + moduleId);
+            }
+
+
+            for (i = 0, arrayLength = mappings.length; i < arrayLength; i++) {
+               domElement = mappings[i];
+
+               if (domElement === undefined || domElement === null) {
+                  errors += "Unmapped moduleId passed to bind: " + moduleId + '\n';
+               }
+
+               element = dom.getElementById(domElement);
+               if (element === undefined || element === null) {
+                  errors += "Undefined dom element passed to bind: " + domElement + '\n';
+               } else {
+                  //remove any bindings on the node
+                  ko.cleanNode(element);
+               }
+            }
+
+            //throw any accumulated errors
+            if (errors !== "") {
+               throw new Error(errors);
+            }
          }
-      }
+      };
    };
-})(document, ko);
+
+   //manage require module loading scenario
+   if (typeof require === 'function') {
+      require(["Core", "knockout"], function (core, ko) {
+         core.DataBinding = (dataBindingFunction)(document, ko);
+      });
+   }
+   else {
+      Core.DataBinding = (dataBindingFunction)(document, ko);
+   }
+
+})();
