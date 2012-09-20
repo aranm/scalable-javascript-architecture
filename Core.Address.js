@@ -389,7 +389,7 @@
    };
 
    if (typeof require === 'function') {
-      require(["Core", "jquery"], function (core, jquery) {
+      require(["Core", "jquery", "address"], function (core, jquery) {
          core.Address = coreAddress(core, jquery.address, window);
       });
    }
