@@ -20,5 +20,4 @@
    else {
       Core.PageData = corePageData();
    }
-
 })();
