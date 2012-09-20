@@ -20,12 +20,31 @@
                 }
              }
              communication.notify("NavigationFinished");
+          },
+          loadAndNavigateTo = function (moduleGroup, raisesEvents, args) {
+             var i, arrayLength, event;
+             require([moduleGroup], function () {
+                startModuleGroup(moduleGroup);
+                if (raisesEvents !== undefined) {
+                   for (i = 0, arrayLength = raisesEvents.length; i < arrayLength; i++) {
+                      event = raisesEvents[i];
+                      communication.notify(event, args[i]);
+                   }
+                }
+                communication.notify("NavigationFinished");
+             });
           };
 
       return {
          addNavigation: function (navigationItem) {
             var wrapper = function () {
                navigateTo(navigationItem.startsModuleGroup, navigationItem.raisesEvents, slice.call(arguments, 0));
+            };
+            communication.addListener(navigationItem.listensTo, wrapper);
+         },
+         addLoadAndNavigate: function (navigationItem) {
+            var wrapper = function () {
+               loadAndNavigateTo(navigationItem.startsModuleGroup, navigationItem.raisesEvents, slice.call(arguments, 0));
             };
             communication.addListener(navigationItem.listensTo, wrapper);
          }
