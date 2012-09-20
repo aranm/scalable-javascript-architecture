@@ -388,9 +388,10 @@
       };
    };
 
-   if (typeof require === 'function') {
-      require(["Core", "jquery", "address"], function (core, jquery) {
+   if (typeof define === "function" && define.amd) {
+      define("Core.Address", ["Core", "jquery", "address"], function (core, jquery) {
          core.Address = coreAddress(core, jquery.address, window);
+         return core.Address;
       });
    }
    else {

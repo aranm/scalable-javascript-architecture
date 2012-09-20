@@ -51,9 +51,10 @@
       };
    };
 
-   if (typeof require === 'function') {
-      require(["Core", "CoreCommunication", "CoreModuleGrouping"], function (core, coreCommunication, coreModuleGrouping) {
+   if (typeof define === "function" && define.amd) {
+      define("Core.Navigation", ["Core", "Core.Communication", "Core.ModuleGrouping"], function (core, coreCommunication, coreModuleGrouping) {
          core.Navigation = coreNavigation(coreCommunication, coreModuleGrouping);
+         return core.Navigation;
       });
    }
    else {

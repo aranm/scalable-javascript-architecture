@@ -59,9 +59,10 @@
    };
    
    //manage require module loading scenario
-   if (typeof require === 'function') {
-      require(["Core"], function (core) {
+   if (typeof define === "function" && define.amd) {
+      define("Core.Controls", ["Core"], function (core) {
          core.Controls = coreControls();
+         return core.Controls;
       });
    }
    else {

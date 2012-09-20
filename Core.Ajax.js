@@ -488,9 +488,10 @@
    };
 
    //manage require module loading scenario
-   if (typeof require === 'function') {
-      require(["Core", "jquery"], function (core, jQuery) {
+   if (typeof define === "function" && define.amd) {
+      define("Core.Ajax", ["Core", "jquery"], function (core, jQuery) {
          core.Ajax = coreAjax(jQuery);
+         return core.Ajax;
       });
    }
    else {

@@ -78,9 +78,10 @@
    };
    
    //manage require module loading scenario
-   if (typeof require === 'function') {
-      require(["Core", "jquery"], function (core, jQuery) {
+   if (typeof define === "function" && define.amd) {
+      define("Core.DomManipulation", ["Core", "jquery"], function (core, jQuery) {
          core.DomManipulation = coreDomManipulation(jQuery, document);
+         return core.DomManipulation;
       });
    }
    else {

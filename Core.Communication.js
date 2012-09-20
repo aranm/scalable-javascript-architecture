@@ -81,8 +81,8 @@
    };
    
    // Expose Core as an AMD module
-   if (typeof define === "function" && define.amd && define.amd.jQuery) {
-      define("CoreCommunication", ["Core"], function (core) {
+   if (typeof define === "function" && define.amd) {
+      define("Core.Communication", ["Core"], function (core) {
          core.Communication = coreCommunication();
          return core.Communication;
       });

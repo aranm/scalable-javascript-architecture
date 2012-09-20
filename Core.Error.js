@@ -1,6 +1,6 @@
 ﻿/*globals Core*/
 (function () {
-   var coreError = function (window) {
+   var coreError = function (ajax, window) {
       //   window.onerror = function (msg, url, num) {
       //      if (window.debug !== undefined && window.debug === false) {
       //         Core.Error.log(1, msg + ';' + url + ';' + num);
@@ -23,7 +23,7 @@
                      trace[i] = encodeURI(trace[i]);
                   }
 
-                  Core.Ajax.request({
+                  ajax.request({
                      name: "errorLog",
                      data: { severity: severity, message: message, stackTrace: trace }
                   });
@@ -64,12 +64,13 @@
       };
    };
 
-   if (typeof require === 'function') {
-      require(["Core"], function (core) {
-         core.Error = coreError(window);
+   if (typeof define === "function" && define.amd) {
+      define("Core.Error", ["Core", "Core.Ajax"], function (core, ajax) {
+         core.Error = coreError(ajax, window);
+         return core.Error;
       });
    }
    else {
-      Core.Error = coreError(window);
+      Core.Error = coreError(Core.Ajax, window);
    }
 })();

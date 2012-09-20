@@ -275,8 +275,8 @@
       };
    };
 
-   if (typeof require === 'function') {
-      define("CoreModuleGrouping", ["Core", "CoreCommunication"], function (core, coreCommunication) {
+   if (typeof define === "function" && define.amd) {
+      define("Core.ModuleGrouping", ["Core", "Core.Communication"], function (core, coreCommunication) {
          core.ModuleGrouping = coreModuleGrouping(core, coreCommunication);
          return core.ModuleGrouping;
       });

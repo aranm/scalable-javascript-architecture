@@ -9,9 +9,10 @@
       };
    };
    
-   if (typeof require === 'function') {
-      require(["Core", "knockout"], function (core, knockout) {
+   if (typeof define === "function" && define.amd) {
+      define("Core.Observable", ["Core", "knockout"], function (core, knockout) {
          core.Observable = coreObservable(knockout);
+         return core.Observable;
       });
    }
    else {

@@ -11,9 +11,10 @@
       };
    };
    
-   if (typeof require === 'function') {
-      require(["Core"], function (core, jquery) {
+   if (typeof define === "function" && define.amd) {
+      define("Core.PageData", ["Core"], function (core) {
          core.PageData = corePageData();
+         return core.PageData;
       });
    }
    else {

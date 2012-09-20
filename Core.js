@@ -155,8 +155,10 @@
    };
 
    // Expose Core as an AMD module
-   if (typeof define === "function" && define.amd && define.amd.jQuery) {
-      define("Core", [], function () { return core(); });
+   if (typeof define === "function" && define.amd) {
+      define("Core", [], function () {
+         return core();
+      });
    }
    else {
       window['Core'] = core();

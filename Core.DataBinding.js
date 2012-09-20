@@ -78,9 +78,10 @@
    };
 
    //manage require module loading scenario
-   if (typeof require === 'function') {
-      require(["Core", "knockout"], function (core, ko) {
+   if (typeof define === "function" && define.amd) {
+      define("Core.DataBinding", ["Core", "knockout"], function (core, ko) {
          core.DataBinding = (dataBindingFunction)(document, ko);
+         return core.DataBinding;
       });
    }
    else {
