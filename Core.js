@@ -24,7 +24,8 @@
                                   functionArguments.push(moduleId);
                                   return newFunctionDefinition.functionPointer.apply(newFunctionDefinition.context, functionArguments);
                                };
-                            } else {
+                            }
+                            else {
                                returnValue = function () {
                                   return newFunctionDefinition.functionPointer.apply(newFunctionDefinition.context, slice.call(arguments, 0));
                                };

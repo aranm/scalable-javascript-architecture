@@ -1,9 +1,6 @@
 ﻿/*globals Core, ko, require*/
-
 (function () {
-
    var dataBindingFunction = function (dom, ko) {
-
       var urlMappings = {};
 
       return {
@@ -35,7 +32,8 @@
                element = dom.getElementById(domElement);
                if (element === undefined || element === null) {
                   errors += "Undefined dom element passed to bind: " + domElement + '\n';
-               } else {
+               }
+               else {
                   ko.applyBindings(viewModel, element);
                }
             }
@@ -64,7 +62,8 @@
                element = dom.getElementById(domElement);
                if (element === undefined || element === null) {
                   errors += "Undefined dom element passed to bind: " + domElement + '\n';
-               } else {
+               }
+               else {
                   //remove any bindings on the node
                   ko.cleanNode(element);
                }

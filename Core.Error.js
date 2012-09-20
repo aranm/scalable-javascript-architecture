@@ -1,9 +1,6 @@
 ﻿/*globals Core*/
-
 (function () {
-
    var coreError = function (window) {
-
       //   window.onerror = function (msg, url, num) {
       //      if (window.debug !== undefined && window.debug === false) {
       //         Core.Error.log(1, msg + ';' + url + ';' + num);
