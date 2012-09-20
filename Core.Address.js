@@ -2,7 +2,7 @@
 //$ - (for jquery address)
 (function () {
 
-   var coreAddress = function (addressManagement, window) {
+   var coreAddress = function (core, addressManagement, window) {
 
       var isEnabled = false,
           startsWith = function (stringToSearch, str) {
@@ -124,7 +124,7 @@
              if (isEnabled === false) { }
              else if (mapping === null) {
                 //if there is no mapping force the redirect to the "home" page
-                Core.Communication.notify("NavigationError", rootUrl);
+                core.Communication.notify("NavigationError", rootUrl);
              }
              else if (forceNavigate === false && isSameUrl(urlDetails) === true && urlDetails.length !== 0) { }
              else {
@@ -140,7 +140,7 @@
                    currentParameters[item.key] = value;
                 });
                 //raise the notification
-                Core.Communication.notify.apply(null, argumentList);
+                core.Communication.notify.apply(null, argumentList);
              }
 
           },
@@ -223,7 +223,7 @@
                    currentParameters[item.key] = value;
                 });
                 //raise the notification
-                Core.Communication.notify.apply(null, argumentList);
+                core.Communication.notify.apply(null, argumentList);
                 forceNavigate = false;
                 updateAddressUrl();
                 didNavigate = true;
@@ -387,14 +387,14 @@
          }
       };
    };
-   
+
    if (typeof require === 'function') {
       require(["Core", "jquery"], function (core, jquery) {
-         core.Address = coreAddress(jquery.address, window);
+         core.Address = coreAddress(core, jquery.address, window);
       });
    }
    else {
-      Core.Address = coreAddress($.address, window);
+      Core.Address = coreAddress(Core, $.address, window);
    }
-   
+
 })();
