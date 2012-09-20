@@ -278,6 +278,7 @@
    if (typeof require === 'function') {
       define("CoreModuleGrouping", ["Core", "CoreCommunication"], function (core, coreCommunication) {
          core.ModuleGrouping = coreModuleGrouping(core, coreCommunication);
+         return core.ModuleGrouping;
       });
    }
    else {
