@@ -22,16 +22,8 @@
              communication.notify("NavigationFinished");
           },
           loadAndNavigateTo = function (moduleGroup, raisesEvents, args) {
-             var i, arrayLength, event;
              require([moduleGroup], function () {
-                startModuleGroup(moduleGroup);
-                if (raisesEvents !== undefined) {
-                   for (i = 0, arrayLength = raisesEvents.length; i < arrayLength; i++) {
-                      event = raisesEvents[i];
-                      communication.notify(event, args[i]);
-                   }
-                }
-                communication.notify("NavigationFinished");
+                navigateTo(moduleGroup, raisesEvents, args);
              });
           };
 
