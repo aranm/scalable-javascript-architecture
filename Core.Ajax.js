@@ -238,7 +238,27 @@
       urlMapper = (function () {
 
          var urlMappings = {};
-         var baseUrl = "";
+         var baseUrl = "",
+            assignMapping = function(parameters) {
+               var newMapping = {},
+                 property,
+                propertyValue;
+               
+               for (property in parameters) {
+                  if (parameters.hasOwnProperty(property)) {
+                     propertyValue = parameters[property];
+                     if (property === "url") {
+                        propertyValue = baseUrl + propertyValue;
+                     }
+                     newMapping[property] = propertyValue;
+                  }
+               }
+               if (newMapping.cacheDuration !== undefined && isNaN(newMapping.cacheDuration) === false) {
+                  //turn the cache duration into milliseconds (entered in minutes)
+                  newMapping.cacheDuration = newMapping.cacheDuration * 1000 * 60;
+               }
+               urlMappings[parameters.name] = newMapping;
+            };
 
          return {
             setBaseUrl: function (newBaseUrl) {
@@ -262,23 +282,12 @@
                   throw new Error("URL mapping cannot be defined without a name");
                }
                else if (urlMappings[parameters.name] !== undefined) {
-                  throw new Error("Duplicate URL mapping defined for mapping ID: " + parameters.name);
+                  //TODO: Check if previous mapping is the same and throw an error if it is not
+                  delete urlMappings[parameters.name];
+                  assignMapping(parameters);
                }
                else {
-                  for (property in parameters) {
-                     if (parameters.hasOwnProperty(property)) {
-                        propertyValue = parameters[property];
-                        if (property === "url") {
-                           propertyValue = baseUrl + propertyValue;
-                        }
-                        newMapping[property] = propertyValue;
-                     }
-                  }
-                  if (newMapping.cacheDuration !== undefined && isNaN(newMapping.cacheDuration) === false) {
-                     //turn the cache duration into milliseconds (entered in minutes)
-                     newMapping.cacheDuration = newMapping.cacheDuration * 1000 * 60;
-                  }
-                  urlMappings[parameters.name] = newMapping;
+                  assignMapping(parameters);
                }
             }
          };
