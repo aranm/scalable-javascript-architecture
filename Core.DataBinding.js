@@ -11,7 +11,10 @@
             if (!urlMappings[name]) {
                urlMappings[name] = [];
             }
-            urlMappings[name].push(domElement);
+            //make sure wo dont add the same binding twice
+            if (urlMappings[name].indexOf(domElement) === -1) {
+               urlMappings[name].push(domElement);
+            }
          },
          applyBinding: function (moduleId, viewModel) {
 
