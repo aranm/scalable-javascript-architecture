@@ -336,7 +336,12 @@
                returnValue = baseUrl + queryString + parameters;
             }
             else {
-               queryString = addressManagement.queryString();
+               if (addParametersToCurrentUrl === false) {
+                  queryString = "";
+               }
+               else {
+                  queryString = addressManagement.queryString();
+               }
                parameters = parameterArray.map(function (keyValuePair) {
                   return keyValuePair.parameter + "=" + keyValuePair.value;
                }).join("&");
