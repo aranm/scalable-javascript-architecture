@@ -53,12 +53,13 @@
             var closedFunction,
                element = $(elementMappings[name]);
 
-            closedFunction = function() {
+            closedFunction = function () {
+               //unbind the 'hide' event
+               element.unbind('hidden', closedFunction);
+
                if (closedCallback !== undefined && typeof closedCallback === "function") {
                   closedCallback();
                }
-               //unbind the 'hide' event
-               element.unbind('hidden', closedFunction);
             };
 
             //show the dialog
