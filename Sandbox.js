@@ -117,6 +117,10 @@
 
       consoleLog: function (message) {
          core.Error.consoleLog(message);
+      },
+
+      getSingleton: function (singletonId) {
+         return core.Singleton.getSingleton(singletonId);
       }
    };
 };
