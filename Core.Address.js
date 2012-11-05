@@ -288,7 +288,7 @@
          updateAddressParameters: function (parameterArray) {
             //update all the parameters
             parameterArray.forEach(function (item) {
-               if (currentParameters[item.parameter] !== item.value) {
+               if (currentParameters[item.parameter] !== undefined && currentParameters[item.parameter] !== item.value) {
                   currentParameters[item.parameter] = item.value;
                }
             });
