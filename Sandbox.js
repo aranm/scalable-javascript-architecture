@@ -121,6 +121,14 @@
 
       getSingleton: function (singletonId) {
          return core.Singleton.getSingleton(singletonId);
-      }
+      },
+      
+      storageHasNativeSupport: core.Storage.hasNativeSupport,
+      storageSetItem: core.Storage.setItem,
+      storageGetItem: core.Storage.getItem,
+      storageSetObject: core.Storage.setObject,
+      storageGetObject: core.Storage.getObject,
+      storageRemoveItem: core.Storage.removeItem,
+      storageClear: core.Storage.clear
    };
 };
