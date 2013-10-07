@@ -61,34 +61,12 @@
          core.ModuleGrouping.stop(moduleGroupName);
       },
 
-      openDialog: function (dialogClosedCallback) {
-         core.DomManipulation.openDialog(moduleId, dialogClosedCallback);
+      openDialog: function (dialogClosedCallback, dialogOpenCallback) {
+         core.DomManipulation.openDialog(moduleId, dialogClosedCallback, dialogOpenCallback);
       },
 
       closeDialog: function () {
          core.DomManipulation.closeDialog(moduleId);
-      },
-
-      updateAddress: function (parameter, value) {
-         core.Address.updateAddress(parameter, value);
-      },
-
-      updateAddressParameters: function (parameterArray) {
-         core.Address.updateAddressParameters(parameterArray);
-      },
-      removeAddressParameter: function (parameterArray) {
-         core.Address.removeAddressParameter(parameterArray);
-      },
-      removeAddressComponent: function (parameter) {
-         core.Address.removeAddressComponent(parameter);
-      },
-
-      createUrl: function (parameter, value) {
-         return core.Address.createUrl(parameter, value);
-      },
-
-      createUrlFromParameterArray: function (parameterArray, addParametersToCurrentUrl) {
-         return core.Address.createUrlFromParameterArray(parameterArray, addParametersToCurrentUrl);
       },
 
       activateControl: function (controlId) {
@@ -96,7 +74,7 @@
       },
 
       createUrlForFileDownload: function (flatParameterArray) {
-         return core.Address.createUrlForFileDownload(flatParameterArray);
+         return core.UrlUtilities.createUrlForFileDownload(flatParameterArray);
       },
 
       destroyControl: function (controlId) {
@@ -129,6 +107,8 @@
       storageSetObject: core.Storage.setObject,
       storageGetObject: core.Storage.getObject,
       storageRemoveItem: core.Storage.removeItem,
-      storageClear: core.Storage.clear
+      storageClear: core.Storage.clear,
+      storageFindKeys: core.Storage.findKeys,
+      storageGetKeys: core.Storage.getKeys
    };
 };

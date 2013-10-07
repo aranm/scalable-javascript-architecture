@@ -20,26 +20,39 @@
          notify: function (topic) {
 
             if (!handlers[topic]) {
-               return true;
+               return undefined;
             }
 
             var args = slice.call(arguments, 1),
             type = topic,
-            ret = true,
             i,
             len,
-            msgList;
+            msgList,
+            msg,
+            returnValue,
+            returnValues = [];
 
             if (handlers[type] instanceof Array) {
                msgList = handlers[type];
-               for (i = 0, len = msgList.length; i < len && ret === true; i++) {
-                  ret = msgList[i].callback.apply(msgList[i].context, args);
-                  if (ret === undefined) {
-                     ret = true;
+               len = msgList.length;
+               for (i = 0; i < len; i++) {
+                  msg = msgList[i];
+                  returnValue = msg.callback.apply(msg.context, args);
+                  if (returnValue !== undefined) {
+                     returnValues.push(returnValue);
                   }
                }
             }
-            return ret;
+            
+            if (returnValues.length === 0) {
+               return undefined;
+            }
+            else if (returnValues.length === 1) {
+               return returnValues[0];
+            }
+            else {
+               return returnValues;
+            }
          },
 
          removeListener: function (topic, callbackFunction) {
@@ -79,7 +92,7 @@
          }
       };
    };
-   
+
    // Expose Core as an AMD module
    if (typeof define === "function" && define.amd) {
       define("Core.Communication", ["Core"], function (core) {

@@ -258,9 +258,7 @@
             mappings = [];
             currentParameters = {};
          },
-         navigateToUrl: function (url) {
-            return navigateToUrl(url);
-         },
+         navigateToUrl: navigateToUrl,
          removeAddressComponent: function (parameter) {
             if (currentParameters[parameter] !== undefined) {
                currentParameters[parameter] = "";

@@ -8,6 +8,12 @@
             return new Date();
          }
       },
+         
+      hasHeaderResponseValues = false,
+         
+      expectedHeaderResponseValues = [],
+         
+      missingHeadersCallback = null,
 
       tryCallFunction = function (callback, context, argument) {
          if (typeof callback === "function") {
@@ -21,9 +27,23 @@
       },
 
       callSuccess = function (moduleId, tempRequest, returnValue) {
-         if (Core.moduleIsActive(moduleId)) {
-            if (returnValue === null) {
-               tryCallFunction(tempRequest.success, tempRequest.context, null);
+         if (Core.moduleIsActive(moduleId) || Core.Singleton.singletonIsActive(moduleId)) {
+            if (returnValue === null || returnValue === undefined) {
+               tryCallFunction(tempRequest.success, tempRequest.context, returnValue);
+            }
+            else if ((typeof returnValue == 'string' || returnValue instanceof String)) {
+               //if we have received something that looks like xml (naive starts with a '<')
+               if (returnValue.substring(0, 1) === "<" && tempRequest.acceptsXmlResponse === true) {
+                  tryCallFunction(tempRequest.success, tempRequest.context, returnValue);
+               }
+               //if we can have a string response
+               else if (tempRequest.acceptsStringResponse == true) {
+                  tryCallFunction(tempRequest.success, tempRequest.context, returnValue);
+               }
+               //otherwise it is a failure
+               else {
+                  tryCallFunction(tempRequest.failure, tempRequest.context, "Server returned an unexpected response, this may indicate that you are no longer logged in to the system. Please refresh your browser");
+               }
             }
             else if (returnValue.RequestSucceeded === undefined) {
                tryCallFunction(tempRequest.success, tempRequest.context, returnValue);
@@ -41,7 +61,7 @@
       },
 
       callFailure = function (moduleId, tempRequest, returnValue) {
-         if (Core.moduleIsActive(moduleId)) {
+         if (Core.moduleIsActive(moduleId) || Core.Singleton.singletonIsActive(moduleId)) {
             tryCallFunction(tempRequest.failure, tempRequest.context, returnValue);
          }
       },
@@ -410,7 +430,26 @@
                       responseFunction(moduleId, requestData, returnValue);
                    }
                 },
-                success = function (returnValue) {
+                success = function(returnValue, status, associatedData) {
+                   var wasSuccessful = true,
+                      i,
+                      arrayLength,
+                      headerResponse;
+                   
+                   if (hasHeaderResponseValues == true && associatedData != undefined && associatedData.getResponseHeader != undefined) {
+                      arrayLength = expectedHeaderResponseValues.length;
+                      for (i = 0; i < arrayLength && wasSuccessful === true; i++) {
+                         headerResponse = expectedHeaderResponseValues[i];
+                         if (associatedData.getResponseHeader(headerResponse.key) != headerResponse.value) {
+                            wasSuccessful = false;
+                         }
+                      }
+                   }
+                   
+                   if (wasSuccessful === false && missingHeadersCallback != null) {
+                      missingHeadersCallback(returnValue, status, associatedData);
+                   }
+                   
                    storedRequests.removeRequest(currentAjaxRequest, moduleId);
                    callFunction(callSuccess, returnValue);
                 },
@@ -420,8 +459,12 @@
                 },
                 errorFunc = function (jqXhr, textStatus, errorThrown) {
                    storedRequests.removeRequest(currentAjaxRequest, moduleId);
+                   if (textStatus === "error") {
+                      // We might need a proper message if no error message passed in
+                      callFunction(callFailure, errorThrown !== "" ? errorThrown : "Failure to connect to the server");
+                   }
                    //when a page navigate occurs ajax requests are cancelled, both status and ready state are 0
-                   if (jqXhr.status === 0 && jqXhr.readyState === 0) { }
+                   else if (jqXhr.status === 0 && jqXhr.readyState === 0) { }
                       //when we abort an ajax call we dont want to call the failure method
                    else if (textStatus === "abort") { }
                    else {
@@ -429,9 +472,9 @@
                    }
                    removeAllQueuedRequests();
                 },
-                successAndCache = function (ajaxReturnValue) {
+                successAndCache = function (ajaxReturnValue, status, associatedData) {
                    cache.addDataToCache(ajaxReturnValue, urlMapping, requestData);
-                   success(ajaxReturnValue);
+                   success(ajaxReturnValue, status, associatedData);
                 };
 
             if (requestData === null || requestData === undefined) {
@@ -492,6 +535,15 @@
 
          cancelRequests: function (moduleId) {
             storedRequests.abortAllForModule(moduleId);
+         },
+         
+         expectedResponseHeaderValues: function (headerRepsonseValues) {
+            expectedHeaderResponseValues = headerRepsonseValues;
+            hasHeaderResponseValues = headerRepsonseValues != null && headerRepsonseValues.length > 0;
+         },
+         
+         reponseFailedDueToMissingHeadersCallback: function (callback){
+            missingHeadersCallback = callback;
          }
       };
    };

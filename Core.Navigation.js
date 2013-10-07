@@ -1,4 +1,4 @@
-﻿/*globals Core*/
+﻿/*globals Core, define, require*/
 
 (function () {
    var coreNavigation = function (communication, moduleGrouping) {

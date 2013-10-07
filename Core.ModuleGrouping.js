@@ -7,6 +7,7 @@
           previewEvents = {},
           restartEvents = {},
           postEvents = {},
+          shutDownEvents = {},
           slice = [].slice,
           inArray = function (list, item) {
              var i, arrayLength, found = false;
@@ -135,6 +136,9 @@
                 if (foundIndex !== -1) {
                    runningModuleGroupings.splice(foundIndex, 1);
                 }
+                
+                raiseEvents(groupingName, shutDownEvents);
+                //communication.notify("ModuleGroupingStopping", groupingName);
              }
              return returnValue;
           },
@@ -261,6 +265,15 @@
                postEvents[groupingName] = [];
             }
             postEvents[groupingName].push(args);
+         },
+         registerShutDownEvents: function () {
+            var groupingName = arguments[0],
+                args = slice.call(arguments, 1);
+
+            if (!shutDownEvents[groupingName]) {
+               shutDownEvents[groupingName] = [];
+            }
+            shutDownEvents[groupingName].push(args);
          },
          start: function (groupingName) {
             return startModuleGroup(groupingName);

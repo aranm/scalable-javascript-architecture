@@ -54,21 +54,20 @@
                throw new Error("No mapping defined for: " + moduleId);
             }
 
-
             for (i = 0, arrayLength = mappings.length; i < arrayLength; i++) {
                domElement = mappings[i];
 
                if (domElement === undefined || domElement === null) {
                   errors += "Unmapped moduleId passed to bind: " + moduleId + '\n';
                }
-
-               element = dom.getElementById(domElement);
-               if (element === undefined || element === null) {
-                  errors += "Undefined dom element passed to bind: " + domElement + '\n';
-               }
                else {
-                  //remove any bindings on the node
-                  ko.cleanNode(element);
+                  element = dom.getElementById(domElement);
+                  //if the dom element no longer exists on the screen, we don't need to unbind it
+                  if (element === undefined || element === null) { }
+                  else {
+                     //remove any bindings on the node
+                     ko.cleanNode(element);
+                  }
                }
             }
 

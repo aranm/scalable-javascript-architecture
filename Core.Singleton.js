@@ -7,11 +7,15 @@
       },
       getSingleton = function (singletonId) {
          return singletons[singletonId];
+      },
+      singletonIsActive = function(singletonId) {
+         return getSingleton(singletonId) !== undefined;
       };
 
       return {
          registerSingleton: registerSingleton,
-         getSingleton: getSingleton
+         getSingleton: getSingleton,
+         singletonIsActive: singletonIsActive
       };
    };
 

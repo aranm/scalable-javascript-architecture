@@ -49,24 +49,24 @@
          getDom: function() {
             return domManipulation;
          },
-         openDialog: function(name, closedCallback) {
-            var closedFunction,
-               element = $(elementMappings[name]);
-
-            closedFunction = function () {
-               //unbind the 'hide' event
-               element.unbind('hidden', closedFunction);
-
+         openDialog: function (name, closedCallback, openCallback) {
+            var closedFunction = function () {
                if (closedCallback !== undefined && typeof closedCallback === "function") {
                   closedCallback();
                }
+            },
+            openFunction = function () {
+               if (openCallback !== undefined && typeof openCallback === "function") {
+                  openCallback();
+               }
             };
-
+            
+            //attach the shown and hidden events to only fire once
+            $(elementMappings[name]).one('shown', openFunction);
+            $(elementMappings[name]).one('hidden', closedFunction);
+            
             //show the dialog
-            element.modal('show');
-
-            //attach an event to the "hide"
-            element.bind('hidden', closedFunction);
+            $(elementMappings[name]).modal('show');
          },
          closeDialog: function(name) {
             var element = $(elementMappings[name]);
