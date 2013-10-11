@@ -9,6 +9,8 @@
          }
       },
          
+      requestHeaders = {},
+         
       hasHeaderResponseValues = false,
          
       expectedHeaderResponseValues = [],
@@ -507,6 +509,7 @@
                      url: urlMapping.url,
                      type: urlMapping.ajaxType,
                      traditional: true,
+                     headers: requestHeaders,
                      failure: failure,
                      error: errorFunc,
                      cache: false
@@ -544,6 +547,10 @@
          
          reponseFailedDueToMissingHeadersCallback: function (callback){
             missingHeadersCallback = callback;
+         },
+         
+         attachRequestHeader: function (key, value) {
+            requestHeaders[key] = value;
          }
       };
    };
