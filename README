@@ -8,7 +8,7 @@ How do I use it?
 
 The library lets you define modules:
 
-```javascript
+```
 Core.register("ModuleA", function (sandbox) {
    return {
       activate: function () {
