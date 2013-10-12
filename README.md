@@ -1,10 +1,13 @@
 Scalable Javascript Architecture
+================================
 
 What is this for?
+-----------------
 
 Basically this is an architectural framework that allows modularisation of javascript code. It also encapsulates your base library of choice in order to provide an abstraction, this allows (in certain scenarios) less dependence on the library.
 
 How do I use it?
+-----------------
 
 The library lets you define modules:
 
