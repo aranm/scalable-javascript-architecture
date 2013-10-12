@@ -18,9 +18,7 @@ Core.register("ModuleA", function (sandbox) {
    };
 });
 ```
-
 Start modules:
-
 ```javascript
 Core.start("ModuleA");
 ```
@@ -54,7 +52,6 @@ Core.register("ModuleB", function (sandbox) {
       }
    };
 });
-
 Core.ModuleGrouping.registerGroup({
    name: "MyModuleGrouping",
    startsModules: ["ModuleA, ModuleB"]
@@ -65,7 +62,6 @@ Start and stop module groupings:
 ```javascript
 Core.ModuleGrouping.start("MyModuleGrouping");
 ```
-
 Define module groupings that depend on other module groupings:
 ```javascript
 Core.register("ModuleC", function (sandbox) {
@@ -76,7 +72,6 @@ Core.register("ModuleC", function (sandbox) {
       }
    };
 });
-
 Core.ModuleGrouping.registerGroup({
    name: "MyNextModuleGrouping",
    dependsOnModuleGroupings: ["MyModuleGrouping"],
