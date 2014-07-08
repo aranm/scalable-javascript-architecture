@@ -1,6 +1,6 @@
 ﻿/*globals Core, require*/
 (function () {
-   var coreModuleGrouping = function (core, communication) {
+   var coreModuleGrouping = function (core, communication, ajax) {
 
       var moduleGroupings = {},
           runningModuleGroupings = [],
@@ -122,7 +122,9 @@
                 if (grouping.startsModules !== undefined) {
                    for (i = 0, arrayLength = grouping.startsModules.length; i < arrayLength; i++) {
                       //stop the modules
-                      core.stop(grouping.startsModules[i]);
+                      var moduleName = grouping.startsModules[i];
+                      ajax.cancelRequests(moduleName);
+                      core.stop(moduleName);
                    }
                 }
                 returnValue = true;
@@ -289,12 +291,12 @@
    };
 
    if (typeof define === "function" && define.amd) {
-      define("Core.ModuleGrouping", ["Core", "Core.Communication"], function (core, coreCommunication) {
-         core.ModuleGrouping = coreModuleGrouping(core, coreCommunication);
+      define("Core.ModuleGrouping", ["Core", "Core.Communication", "Core.Ajax"], function (core, coreCommunication, coreAjax) {
+         core.ModuleGrouping = coreModuleGrouping(core, coreCommunication, coreAjax);
          return core.ModuleGrouping;
       });
    }
    else {
-      Core.ModuleGrouping = coreModuleGrouping(Core, Core.Communication);
+      Core.ModuleGrouping = coreModuleGrouping(Core, Core.Communication, Core.Ajax);
    }
 })();
