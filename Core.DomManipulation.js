@@ -61,12 +61,11 @@
                }
             };
             
-            //attach the shown and hidden events to only fire once
-            $(elementMappings[name]).one('shown', openFunction);
-            $(elementMappings[name]).one('hidden', closedFunction);
-            
             //show the dialog
-            $(elementMappings[name]).modal('show');
+            $(elementMappings[name])
+               .one('shown.bs.modal', openFunction)
+               .one('hidden.bs.modal', closedFunction)
+               .modal('show');
          },
          closeDialog: function(name) {
             var element = $(elementMappings[name]);
