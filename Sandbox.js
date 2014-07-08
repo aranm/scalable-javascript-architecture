@@ -1,7 +1,12 @@
 ﻿var Sandbox = function (core, moduleId) {
-
+   var getPageSpecificData = function () {
+      return core.PageData.getPageData(moduleId);
+   };
+   var defaults = {      
+        DROPDOWN_FIRST_SELECT_OPTION: ''
+   };
    return {
-
+      getPageSpecificData:getPageSpecificData,
       notify: function () {
          return core.Communication.notify.apply(core.Communication, arguments);
       },
@@ -25,8 +30,20 @@
       //      success: callback function (response) - optional
       //      failure: callback function (error message) - optional
       //   }
-      request: function (data) {
+    
+      request: function(data) {
          core.Ajax.request(data, moduleId);
+      },
+      getRequestQueue:function() {
+          return core.Ajax.getRequestQueue();
+      },
+      // called from authentication error module before resending requests
+      clearRequestQueue:function() {
+          core.Ajax.clearRequestQueue();
+      },
+ 
+      attachRequestHeader: function(key, value) {
+         core.Ajax.attachRequestHeader(key, value);
       },
 
       cancelRequests: function () {
@@ -49,9 +66,7 @@
          return core.DomManipulation.getDom();
       },
 
-      getPageSpecificData: function () {
-         return core.PageData.getPageData(moduleId);
-      },
+    
 
       startModuleGroup: function (moduleGroupName) {
          core.ModuleGrouping.start(moduleGroupName);
@@ -100,7 +115,10 @@
       getSingleton: function (singletonId) {
          return core.Singleton.getSingleton(singletonId);
       },
-      
+      openPostRequestPage: function (postModel) {
+         postModel.params.viewDate = getPageSpecificData().currentViewDate,
+         core.OpenPostRequestPage.requestPage(postModel);
+      },
       storageHasNativeSupport: core.Storage.hasNativeSupport,
       storageSetItem: core.Storage.setItem,
       storageGetItem: core.Storage.getItem,
@@ -109,6 +127,7 @@
       storageRemoveItem: core.Storage.removeItem,
       storageClear: core.Storage.clear,
       storageFindKeys: core.Storage.findKeys,
-      storageGetKeys: core.Storage.getKeys
+      storageGetKeys: core.Storage.getKeys,
+      defaults:defaults
    };
 };
